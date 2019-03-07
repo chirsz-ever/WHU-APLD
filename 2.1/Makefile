@@ -2,31 +2,52 @@ SRC=./src
 OBJ=./obj
 BIN=./bin
 CXX=g++
-CC_FLAG=-std=c++11 
-LIB= 
+C_FLAG=-std=c++11 -I./src -Wall
+LINK_FLAGS= 
 EXE_SUFFIX=.exe
 
-BASE_LIB=$(OBJ)/random_wander.o
 WANDER1=wander_sample1
 WANDER2=wander_sample2
-WANDER1_EXE=$(WANDER1)$(EXE_SUFFIX)
-WANDER2_EXE=$(WANDER2)$(EXE_SUFFIX)
+WANDER1_OBJ=${OBJ}/${WANDER1}.o
+WANDER2_OBJ=${OBJ}/${WANDER2}.o
+WANDER1_BIN=${BIN}/$(WANDER1)$(EXE_SUFFIX)
+WANDER2_BIN=${BIN}/$(WANDER2)$(EXE_SUFFIX)
 
-all:$(BIN)/$(WANDER1_EXE) $(BIN)/$(WANDER2_EXE)
+OBJECTS=$(patsubst ${SRC}/%.cpp, ${OBJ}/%.o,$(wildcard ${SRC}/*.cpp))
+BASE_OBJS=$(filter-out ${OBJ}/$(WANDER1).o ${OBJ}/$(WANDER2).o,$(OBJECTS))
+SUBDIRS=${OBJ} ${BIN}
 
-$(BIN)/$(WANDER1_EXE):$(OBJ)/$(WANDER1).o $(BASE_LIB)
-	@if [ ! -d $(BIN) ]; then mkdir -p $(BIN); fi;
-	$(CXX) $^ -o $@ $(LIB)
+.PHONY:clean cleanall all
 
-$(BIN)/$(WANDER2_EXE):$(OBJ)/$(WANDER2).o $(BASE_LIB)
-	@if [ ! -d $(BIN) ]; then mkdir -p $(BIN); fi;
-	$(CXX) $^ -o $@ $(LIB)
+all: ${SUBDIRS} ${WANDER1_BIN} ${WANDER2_BIN}
+	
 
-$(OBJ)/%.o:${SRC}/%.cpp
-	@if [ ! -d $(OBJ) ]; then mkdir -p $(OBJ); fi;
-	$(CXX) $(CC_FLAG) -o $@ -c $<
+${SUBDIRS}:%:
+	@mkdir -p $@
 
-.PRONY:clean
+${WANDER1_BIN}: ${BASE_OBJS} ${WANDER1_OBJ}
+	${CXX} $^ -o $@ ${LINK_FLAGS}
+	@echo "build $@ successfully"
+
+${WANDER2_BIN}: ${BASE_OBJS} ${WANDER2_OBJ}
+	${CXX} $^ -o $@ ${LINK_FLAGS}
+	@echo "build $@ successfully"
+
+sinclude ${OBJECTS:.o=.d} 
+
+$(OBJ)/%.o:${SRC}/%.cpp 
+	$(CXX) $(C_FLAG) -o $@ -c $<
+
+$(OBJ)/%.d:${SRC}/%.cpp 
+	@mkdir -p ${OBJ}
+	@echo "Making $@ ..."
+	@${CXX}  $< ${C_FLAG} -MM -MT"$(OBJ)/$*.o" -MT"$@" -MF"$@" 
+
 clean:
-	@echo "Removing linked and compiled files......"
-	-rm -rf $(OBJ) $(BIN)
+	@echo "Removing binary files......"
+	-rm -rf $(OBJ)/*.o $(BIN)/*.*
+
+cleanall:
+	@echo "Removing all produced files......"
+	-rm -rf $(OBJ) $(BIN) 
+
