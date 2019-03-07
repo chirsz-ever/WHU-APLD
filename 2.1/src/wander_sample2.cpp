@@ -3,7 +3,6 @@
 #include <cstdlib>
 #include <ctime>
 #include <vector>
-#include <cinttypes>
 
 using std::cout;
 using std::cin;

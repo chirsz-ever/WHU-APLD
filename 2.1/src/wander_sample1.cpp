@@ -2,7 +2,6 @@
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
-#include <cinttypes>
 
 using std::cout;
 using std::cin;
