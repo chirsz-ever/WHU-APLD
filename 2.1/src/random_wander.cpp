@@ -1,6 +1,7 @@
 #include "random_wander.h"
 #include <vector>
 #include <cstdlib>
+#include <cstdint>
 
 using std::vector;
 static vector<bool> grids;
@@ -13,14 +14,14 @@ static int directions[4][2] = {{ 0, -1}, { -1, 0}, {1, 0}, {0, 1}};
                         GRID((x)-1,(y))&&   \
                         GRID((x),(y)-1))
 
-long random_wander(const size_t N)
+int64_t random_wander(const uint64_t N)
 {
     // 重置“已到路口”记录
     grids.clear();
     grids.resize(N * N, false);
 
-    long x = N / 2, y = N / 2;
-    long steps = 0;
+    uint64_t x = N / 2, y = N / 2;
+    int64_t steps = 0;
 
     while (true)
     {

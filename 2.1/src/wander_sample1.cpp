@@ -2,6 +2,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
+#include <cinttypes>
 
 using std::cout;
 using std::cin;
@@ -10,7 +11,7 @@ using std::endl;
 
 int main(int argc, char const *argv[])
 {
-    size_t N, T;
+    uint64_t N, T;
     switch (argc)
     {
     case 3:
@@ -37,11 +38,11 @@ int main(int argc, char const *argv[])
 
     srand(time(0));
 
-    size_t escape = 0, impasse = 0;
+    uint64_t escape = 0, impasse = 0;
     double success_path_sum = 0.0, fail_path_sum = 0.0;
-    for (int i = 0; i < T; ++i)
+    for (uint64_t i = 0; i < T; ++i)
     {
-        const long steps = random_wander(N);
+        const auto steps = random_wander(N);
         if (steps > 0)
         {
             ++escape;
@@ -54,9 +55,9 @@ int main(int argc, char const *argv[])
         }
     }
     cout << "执行完毕" << endl;
-    printf("成功逃出%ld次，频率为%.4lf，平均路径长度为%.2lf\n",
+    printf("成功逃出%llu次，频率为%.4lf，平均路径长度为%.2lf\n",
            escape, double(escape) / T, success_path_sum / escape);
-    printf("进入死胡同%ld次，频率为%.4lf，平均路径长度为%.2lf\n",
+    printf("进入死胡同%llu次，频率为%.4lf，平均路径长度为%.2lf\n",
            impasse, double(impasse) / T, fail_path_sum / impasse);
 
     return 0;

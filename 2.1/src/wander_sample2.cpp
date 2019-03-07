@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <vector>
+#include <cinttypes>
 
 using std::cout;
 using std::cin;
@@ -17,12 +18,12 @@ static void input_error()
 
 int main(int argc, char const *argv[])
 {
-    size_t T;
-    std::vector<size_t> Ns;
+    uint64_t T;
+    std::vector<uint64_t> Ns;
     switch (argc)
     {
     case 1:
-        size_t N;
+        uint64_t N;
         cout << "请输入一组网格数：";
         while (cin >> N)
         {
@@ -60,14 +61,14 @@ int main(int argc, char const *argv[])
     srand(time(0));
 
     printf("N\t频率\n");
-    for (size_t N : Ns)
+    for (auto N : Ns)
     {
-        size_t escape = 0;
-        for (int i = 0; i < T; ++i)
+        uint64_t escape = 0;
+        for (uint64_t i = 0; i < T; ++i)
             if (random_wander(N) > 0)
                 ++escape;
 
-        printf("%ld\t%%%0.3lf\n", N, double(escape) / T * 100.0 );
+        printf("%llu\t%%%0.3lf\n", N, double(escape) / T * 100.0 );
         fflush(stdout);
     }
 
