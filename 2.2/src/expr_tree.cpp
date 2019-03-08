@@ -105,18 +105,18 @@ Associativity assctvt(TokenType tt) {
 static const char* to_str(TokenType tt) {
     static string opcache;
     switch (tt) {
-    case TokenType::Pow: opcache = "^"; break;
-    case TokenType::Mul: opcache = "*"; break;
-    case TokenType::Div: opcache = "/"; break;
-    case TokenType::Mod: opcache = "%"; break;
-    case TokenType::ExactDiv: opcache = "//"; break;
-    case TokenType::Add: opcache = "+"; break;
-    case TokenType::Sub: opcache = "-"; break;
-    case TokenType::LPt: opcache = "("; break;
-    case TokenType::RPt: opcache = ")"; break;
-    case TokenType::Num: opcache = "Num"; break;
-    case TokenType::Symbol: opcache = "Symbol"; break;
-    case TokenType::None: opcache = "None"; break;
+    case TokenType::Pow:        opcache = "^"; break;
+    case TokenType::Mul:        opcache = "*"; break;
+    case TokenType::Div:        opcache = "/"; break;
+    case TokenType::Mod:        opcache = "%"; break;
+    case TokenType::ExactDiv:   opcache = "//"; break;
+    case TokenType::Add:        opcache = "+"; break;
+    case TokenType::Sub:        opcache = "-"; break;
+    case TokenType::LPt:        opcache = "("; break;
+    case TokenType::RPt:        opcache = ")"; break;
+    case TokenType::Num:        opcache = "Num"; break;
+    case TokenType::Symbol:     opcache = "Symbol"; break;
+    case TokenType::None:       opcache = "None"; break;
     default:
         throw UNEXPECT(tt);
     }
