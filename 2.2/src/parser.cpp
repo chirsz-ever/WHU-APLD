@@ -95,7 +95,10 @@ TreeNode* Parser::factor() {
 
 
 ExprTree Parser::build_tree() {
-    return ExprTree(expr());
+    auto tree = ExprTree(expr());
+    if (lexer.peek() != TokenType::None)
+        throw ERROR;
+    return tree;
 }
 
 }

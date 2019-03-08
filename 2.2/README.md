@@ -78,7 +78,12 @@ unknown character '$' on 4
 --> quit
 quit.
 ```
+
+## 致谢
+
+本程序中词法解析器和语法解析器的构建主要参考了这一系列的博文：[手把手教你构建 C 语言编译器](https://lotabout.me/2015/write-a-C-interpreter-0/)，在此对文章作者[lotabout](https://lotabout.me/)表示感谢。
+
 ## 待解决BUG
 
 - [x] `199*199+34*34+4`
-- [ ] `aa` `34 34` `34+34 23`
+- [x] `aa` `34 34` `34+34 23`
