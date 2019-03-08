@@ -78,4 +78,7 @@ unknown character '$' on 4
 --> quit
 quit.
 ```
+## 待解决BUG
 
+- [x] `199*199+34*34+4`
+- [ ] `aa` `34 34` `34+34 23`

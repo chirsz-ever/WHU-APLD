@@ -2,7 +2,13 @@
 #include <string>
 #include <iostream>
 
+#define UNEXPECT(sym) std::runtime_error( \
+    string(__FILE__)+":"+to_string(__LINE__) \
+    +":Unexpected symbol '"+to_str(sym)+\
+    "' in "+__func__)
+
 using std::string;
+using std::to_string;
 using std::ostream;
 
 namespace chirsz {
@@ -43,6 +49,8 @@ inline bool is_binop(TokenType tt) {
     return !is_item(tt) && tt != TokenType::LPt && tt != TokenType::RPt;
 }
 
+static const char* to_str(TokenType tt);
+
 static int tt_priority(TokenType tt) {
     int p;
     switch (tt) {
@@ -64,7 +72,7 @@ static int tt_priority(TokenType tt) {
         p = 100;
         break;
     default:
-        throw std::runtime_error("unreachable!");
+        throw UNEXPECT(tt);
     }
     return p;
 }
@@ -87,14 +95,15 @@ Associativity assctvt(TokenType tt) {
     case TokenType::Add:
     case TokenType::Sub:
         a = Left;
+        break;
     default:
-        throw std::runtime_error("unreachable!");
+        throw UNEXPECT(tt);
     }
     return a;
 }
 
 static const char* to_str(TokenType tt) {
-    string opcache;
+    static string opcache;
     switch (tt) {
     case TokenType::Pow: opcache = "^"; break;
     case TokenType::Mul: opcache = "*"; break;
@@ -103,8 +112,13 @@ static const char* to_str(TokenType tt) {
     case TokenType::ExactDiv: opcache = "//"; break;
     case TokenType::Add: opcache = "+"; break;
     case TokenType::Sub: opcache = "-"; break;
+    case TokenType::LPt: opcache = "("; break;
+    case TokenType::RPt: opcache = ")"; break;
+    case TokenType::Num: opcache = "Num"; break;
+    case TokenType::Symbol: opcache = "Symbol"; break;
+    case TokenType::None: opcache = "None"; break;
     default:
-        throw std::runtime_error("unreachable!");
+        throw UNEXPECT(tt);
     }
     return opcache.c_str();
 }
@@ -120,7 +134,7 @@ static ostream& et_print_as_infix(ostream &out, const TreeNode* tn) {
                 out << tn->tval.symbol;
                 break;
             default:
-                throw std::runtime_error("unreachable!");
+                throw UNEXPECT(tn->ttype);
             }
         }
         else if (is_binop(tn->ttype)) {
@@ -158,7 +172,7 @@ static ostream& et_print_as_suffix(ostream &out, const TreeNode* tn) {
                 out << tn->tval.symbol;
                 break;
             default:
-                throw std::runtime_error("unreachable!");
+                throw UNEXPECT(tn->ttype);
             }
         }
         else if (is_binop(tn->ttype))
