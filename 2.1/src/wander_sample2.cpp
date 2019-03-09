@@ -3,11 +3,16 @@
 #include <cstdlib>
 #include <ctime>
 #include <vector>
+#include <cctype>
+#include <string>
+#include <sstream>
 
 using std::cout;
 using std::cin;
 using std::cerr;
 using std::endl;
+using std::string;
+using std::getline;
 
 static void input_error()
 {
@@ -15,26 +20,69 @@ static void input_error()
     exit(1);
 }
 
+static void get_args(int argc, char const *argv[], uint64_t &T, std::vector<uint64_t> &Ns);
+
 int main(int argc, char const *argv[])
 {
-    uint64_t T;
+    uint64_t T = 0;
     std::vector<uint64_t> Ns;
+    get_args(argc, argv, T, Ns);
+
+    if (Ns.empty() || T == 0) input_error();
+
+    cout << "网格大小：";
+    for (size_t N : Ns)
+        cout << N << " ";
+    cout << endl;
+    cout << "执行次数：" << T << endl;
+
+    srand(time(0));
+
+    printf("N\t逃出频率\n");
+    for (auto N : Ns)
+    {
+        uint64_t escape = 0;
+        for (uint64_t i = 0; i < T; ++i)
+            if (random_wander(N) > 0)
+                ++escape;
+
+        printf("%llu\t%%%0.3lf\n", N, double(escape) / T * 100.0 );
+        fflush(stdout);
+    }
+
+    return 0;
+}
+
+static void get_args(int argc, char const *argv[], uint64_t &T, std::vector<uint64_t> &Ns)
+{
     switch (argc)
     {
-    case 1:
-        uint64_t N;
-        cout << "请输入一组网格数：";
-        while (cin >> N)
+    case 1: {
+        uint64_t N = 0;
+        string line;
+
+        while (line.empty())
+        {
+            cout << "请输入一组网格数：";
+            getline(cin, line);
+        }
+        std::istringstream parse_line(line);
+        while (parse_line >> N)
         {
             if (N == 0) input_error();
             Ns.push_back(N);
-            if (cin.peek()=='\n')
-                break;
         }
-        cout << "请输入执行次数：";
-        cin >> T;
-        if (cin.fail()) input_error();
+
+        line.clear();
+        while (line.empty())
+        {
+            cout << "请输入执行次数：";
+            getline(cin, line);
+        }
+        parse_line = std::istringstream(line);
+        parse_line >> T;
         break;
+    }
     case 2:
         input_error();
         break;
@@ -48,28 +96,4 @@ int main(int argc, char const *argv[])
         }
         T = atol(argv[argc - 1]);
     }
-
-    if (Ns.empty() || T == 0) input_error();
-
-    cout << "网格大小：";
-    for (size_t N : Ns)
-        cout << N << " ";
-    cout << endl;
-    cout << "T=" << T << endl;
-
-    srand(time(0));
-
-    printf("N\t频率\n");
-    for (auto N : Ns)
-    {
-        uint64_t escape = 0;
-        for (uint64_t i = 0; i < T; ++i)
-            if (random_wander(N) > 0)
-                ++escape;
-
-        printf("%llu\t%%%0.3lf\n", N, double(escape) / T * 100.0 );
-        fflush(stdout);
-    }
-
-    return 0;
 }
