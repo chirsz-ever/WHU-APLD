@@ -6,6 +6,7 @@
 #include <cctype>
 #include <string>
 #include <sstream>
+#include <algorithm>
 
 using std::cout;
 using std::cin;
@@ -61,7 +62,7 @@ static void get_args(int argc, char const *argv[], uint64_t &T, std::vector<uint
         uint64_t N = 0;
         string line;
 
-        while (line.empty())
+        while (std::all_of(line.begin(), line.end(), isspace))
         {
             cout << "请输入一组网格数：";
             getline(cin, line);
@@ -74,7 +75,7 @@ static void get_args(int argc, char const *argv[], uint64_t &T, std::vector<uint
         }
 
         line.clear();
-        while (line.empty())
+        while (std::all_of(line.begin(), line.end(), isspace))
         {
             cout << "请输入执行次数：";
             getline(cin, line);

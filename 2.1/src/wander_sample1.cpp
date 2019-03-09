@@ -2,34 +2,30 @@
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
+#include <string>
+#include <sstream>
+#include <algorithm>
 
 using std::cout;
 using std::cin;
 using std::cerr;
 using std::endl;
+using std::string;
+using std::getline;
+
+static void get_args(int argc, char const *argv[], uint64_t &N, uint64_t &T);
 
 int main(int argc, char const *argv[])
 {
     uint64_t N, T;
-    switch (argc)
-    {
-    case 3:
-        N = atol(argv[1]);
-        T = atol(argv[2]);
-        break;
-    case 1:
-        N = 50;
-        cout << "请输入执行次数：";
-        cin >> T;
-        break;
-    default:
-        N = T = 0;
-    }
+
+    get_args(argc, argv, N, T);
     if (N == 0 || T == 0)
     {
         cerr << "读取参数时发生错误" << endl;
         return 1;
     }
+
     cout << "N=" << N << endl;
     cout << "T=" << T << endl;
     cout << "执行中……  " ;
@@ -60,4 +56,30 @@ int main(int argc, char const *argv[])
            impasse, double(impasse) / T, fail_path_sum / impasse);
 
     return 0;
+}
+
+static void get_args(int argc, char const *argv[], uint64_t &N, uint64_t &T)
+{
+    switch (argc)
+    {
+    case 3:
+        N = atol(argv[1]);
+        T = atol(argv[2]);
+        break;
+    case 1:
+    {
+        N = 50;
+        string line;
+        while (std::all_of(line.begin(), line.end(), isspace))
+        {
+            cout << "请输入执行次数：";
+            getline(cin, line);
+        }
+        std::istringstream parse_line(line);
+        parse_line >> T;
+        break;
+    }
+    default:
+        N = T = 0;
+    }
 }

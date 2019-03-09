@@ -22,7 +22,7 @@ int main(int argc, char const *argv[]) {
         getline(cin, line);
 
         // 空行则重新输入
-        if (std::all_of(line.begin(),line.end(),isspace))
+        if (std::all_of(line.begin(), line.end(), isspace))
             continue;
 
         // 如果输入 "quit" 则退出
