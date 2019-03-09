@@ -4,6 +4,7 @@
 #include "expr_tree.h"
 #include "lexer.h"
 #include "parser.h"
+#include <algorithm>
 
 using std::string;
 using std::cin;
@@ -19,6 +20,10 @@ int main(int argc, char const *argv[]) {
     while (true) {
         cout << "--> ";
         getline(cin, line);
+
+        // 空行则重新输入
+        if (std::all_of(line.begin(),line.end(),isspace))
+            continue;
 
         // 如果输入 "quit" 则退出
         if (line == "quit")
