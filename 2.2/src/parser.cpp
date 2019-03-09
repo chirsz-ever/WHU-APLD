@@ -96,6 +96,8 @@ TreeNode* Parser::factor() {
 
 ExprTree Parser::build_tree() {
     auto tree = ExprTree(expr());
+
+    // 解析完表达式而没有到达结尾，是输入字符串异常
     if (lexer.peek() != TokenType::None)
         throw ERROR;
     return tree;

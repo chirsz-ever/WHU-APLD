@@ -22,7 +22,7 @@ class ExprTree
 {
 public:
     ExprTree();
-    ExprTree(TreeNode*);
+    ExprTree(TreeNode*); // 获得所有权
     ExprTree(ExprTree&&)=default;
     ~ExprTree();
 
@@ -31,7 +31,10 @@ public:
 private:
     TreeNode* head;
 // friend:
+    // 以中缀形式输出表达式树
     friend std::ostream& print_as_infix(std::ostream&, const ExprTree&);
+
+    // 以后缀形式输出表达式树
     friend std::ostream& print_as_suffix(std::ostream&, const ExprTree&);
 };
 

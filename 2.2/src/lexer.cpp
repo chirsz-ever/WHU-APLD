@@ -22,6 +22,7 @@ TokenType Lexer::next() {
         ++m_position;
     }
 
+    // 到结尾后一直返回None
     if (m_position >= m_sentence.size())
     {
         m_last_token_len = 0;
@@ -30,7 +31,7 @@ TokenType Lexer::next() {
 
     char token = m_sentence[m_position];
 
-    if (isdigit(token)) {
+    if (isdigit(token)) { // 匹配数字
         int cnt;
         double num_val;
         sscanf(m_sentence.c_str() + m_position, "%lf%n", &num_val, &cnt);
@@ -39,13 +40,13 @@ TokenType Lexer::next() {
         m_last_value.num = num_val;
         return TokenType::Num;
     }
-    else if (islower(token) || isupper(token)) {
+    else if (islower(token) || isupper(token)) { // 匹配单字母符号
         m_position += 1;
         m_last_value.symbol = token;
         m_last_token_len = 1;
         return TokenType::Symbol;
     }
-    else {
+    else { // 匹配其它标记，一般是运算符
         m_last_token_len = 1;
         switch (token) {
         case '(': ++m_position; return TokenType::LPt;

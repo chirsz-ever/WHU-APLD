@@ -14,16 +14,20 @@ using namespace chirsz;
 
 int main(int argc, char const *argv[]) {
     string line;
+
+    // REPL
     while (true) {
         cout << "--> ";
         getline(cin, line);
 
+        // 如果输入 "quit" 则退出
         if (line == "quit")
         {
             cout << "quit." << endl;
             break;
         }
 
+        // 解析输入内容为表达式树
         ExprTree tree;
         try {
             auto lexer = Lexer(line);
@@ -33,7 +37,11 @@ int main(int argc, char const *argv[]) {
             cout << e.what() << endl;
             continue;
         }
+
+        // 以中缀形式输出表达式树
         print_as_infix(cout, tree) << endl;
+
+        // 以后缀形式输出表达式树
         print_as_suffix(cout, tree) << endl;
     }
     return 0;

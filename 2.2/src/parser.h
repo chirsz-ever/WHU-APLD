@@ -10,7 +10,7 @@ class Parser
 {
 public:
     Parser(Lexer&);
-    
+
     ExprTree build_tree();
 
 private:
@@ -20,6 +20,7 @@ private:
     // 如不匹配则抛出异常。
     void match(TokenType);
 
+    // 为每个非终结符编写一个函数
     TreeNode* expr();
     TreeNode* expr_tail(TreeNode* ltree);
     TreeNode* term();
