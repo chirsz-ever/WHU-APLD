@@ -3,8 +3,12 @@ OBJ=./obj
 BIN=./bin
 CXX=g++
 C_FLAG=-std=c++11 -I./src -Wall
-LINK_FLAGS= 
-EXE_SUFFIX=.exe
+LINK_FLAGS=
+ifneq ($(shell uname), Linux)
+	EXE_SUFFIX=.exe
+else
+	EXE_SUFFIX=
+endif
 
 WANDER1=wander_sample1
 WANDER2=wander_sample2
@@ -20,7 +24,7 @@ SUBDIRS=${OBJ} ${BIN}
 .PHONY:clean cleanall all
 
 all: ${SUBDIRS} ${WANDER1_BIN} ${WANDER2_BIN}
-	
+
 
 ${SUBDIRS}:%:
 	@mkdir -p $@
@@ -33,15 +37,15 @@ ${WANDER2_BIN}: ${BASE_OBJS} ${WANDER2_OBJ}
 	${CXX} $^ -o $@ ${LINK_FLAGS}
 	@echo "build $@ successfully"
 
-sinclude ${OBJECTS:.o=.d} 
+sinclude ${OBJECTS:.o=.d}
 
-$(OBJ)/%.o:${SRC}/%.cpp 
+$(OBJ)/%.o:${SRC}/%.cpp
 	$(CXX) $(C_FLAG) -o $@ -c $<
 
-$(OBJ)/%.d:${SRC}/%.cpp 
+$(OBJ)/%.d:${SRC}/%.cpp
 	@mkdir -p ${OBJ}
 	@echo "Making $@ ..."
-	@${CXX}  $< ${C_FLAG} -MM -MT"$(OBJ)/$*.o" -MT"$@" -MF"$@" 
+	@${CXX}  $< ${C_FLAG} -MM -MT"$(OBJ)/$*.o" -MT"$@" -MF"$@"
 
 clean:
 	@echo "Removing binary files......"
@@ -49,5 +53,5 @@ clean:
 
 cleanall:
 	@echo "Removing all produced files......"
-	-rm -rf $(OBJ) $(BIN) 
+	-rm -rf $(OBJ) $(BIN)
 

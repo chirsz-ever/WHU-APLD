@@ -4,7 +4,11 @@ BIN=./bin
 CXX=g++
 C_FLAG=-std=c++11 -I./src -Wall
 LINK_FLAGS=
-EXE_SUFFIX=.exe
+ifneq ($(shell uname), Linux)
+	EXE_SUFFIX=.exe
+else
+	EXE_SUFFIX=
+endif
 
 OBJECTS=$(patsubst ${SRC}/%.cpp, ${OBJ}/%.o,$(wildcard ${SRC}/*.cpp))
 TARGET=${BIN}/DFS${EXE_SUFFIX}
