@@ -10,6 +10,7 @@
 using std::string;
 using std::to_string;
 using std::ostream;
+using std::unique_ptr;
 
 namespace chirsz {
 
@@ -18,27 +19,27 @@ ExprTree::ExprTree(): head(nullptr) {}
 ExprTree::ExprTree(TreeNode* tn): head(tn) {}
 
 const ExprTree& ExprTree::operator=(ExprTree&& et) {
-    this->head = et.head;
-    et.head = nullptr;
+    this->head.reset(nullptr);
+    this->head.swap(et.head);
     return *this;
 }
 
-ExprTree::~ExprTree() {
-    delete_tree_node(this->head);
-    this->head = nullptr;
+// ExprTree::~ExprTree() {
+//     delete_tree_node(this->head);
+//     this->head = nullptr;
+// }
+
+unique_ptr<TreeNode> new_tree_node(TokenType ttype, TreeNode* left, TreeNode* right) {
+    return unique_ptr<TreeNode>(new TreeNode{ttype, {0}, TNHdl(left), TNHdl(right)});
 }
 
-TreeNode* new_tree_node(TokenType ttype, TreeNode* left, TreeNode* right) {
-    return new TreeNode{ttype, {0}, left, right};
-}
-
-void delete_tree_node(TreeNode *tn) {
-    if (tn) {
-        if (tn->left) delete_tree_node(tn->left);
-        if (tn->right) delete_tree_node(tn->right);
-        delete tn;
-    }
-}
+// void delete_tree_node(TreeNode *tn) {
+//     if (tn) {
+//         if (tn->left) delete_tree_node(tn->left);
+//         if (tn->right) delete_tree_node(tn->right);
+//         delete tn;
+//     }
+// }
 
 
 inline bool is_item(TokenType tt) {
@@ -143,18 +144,18 @@ static ostream& et_print_as_infix(ostream &out, const TreeNode* tn) {
             int pr = tt_priority(tn->right->ttype);
             if (pl < pn
                     || (tn->left->ttype == tn->ttype && assctvt(tn->ttype) == Right)) {
-                et_print_as_infix(out << '(', tn->left) << ')';
+                et_print_as_infix(out << '(', tn->left.get()) << ')';
             }
             else {
-                et_print_as_infix(out, tn->left);
+                et_print_as_infix(out, tn->left.get());
             }
             out << to_str(tn->ttype);
             if (pr < pn
                     || (tn->right->ttype == tn->ttype && assctvt(tn->ttype) == Left)) {
-                et_print_as_infix(out << '(', tn->right) << ')';
+                et_print_as_infix(out << '(', tn->right.get()) << ')';
             }
             else {
-                et_print_as_infix(out, tn->right);
+                et_print_as_infix(out, tn->right.get());
             }
         }
     }
@@ -177,8 +178,8 @@ static ostream& et_print_as_suffix(ostream &out, const TreeNode* tn) {
         }
         else if (is_binop(tn->ttype))
         {
-            et_print_as_suffix(out, tn->left);
-            et_print_as_suffix(out, tn->right);
+            et_print_as_suffix(out, tn->left.get());
+            et_print_as_suffix(out, tn->right.get());
             out << to_str(tn->ttype);
         }
     }
@@ -186,11 +187,11 @@ static ostream& et_print_as_suffix(ostream &out, const TreeNode* tn) {
 }
 
 std::ostream& print_as_infix(std::ostream &out, const ExprTree &et) {
-    return et_print_as_infix(out, et.head);
+    return et_print_as_infix(out, et.head.get());
 }
 
 std::ostream& print_as_suffix(std::ostream &out, const ExprTree &et) {
-    return et_print_as_suffix(out, et.head);
+    return et_print_as_suffix(out, et.head.get());
 }
 
 }

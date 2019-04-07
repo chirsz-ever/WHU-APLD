@@ -4,6 +4,7 @@
 
 using std::to_string;
 using std::string;
+using std::unique_ptr;
 
 #define ERROR (std::runtime_error(string(__FILE__)+":"+to_string(__LINE__)+":"\
     + " unexpect token near position " \
@@ -20,29 +21,29 @@ void Parser::match(TokenType tt) {
     }
 }
 
-TreeNode* Parser::expr() {
+TNHdl Parser::expr() {
     auto ltree = term();
-    return expr_tail(ltree);
+    return expr_tail(ltree.release());
 }
 
-TreeNode* Parser::expr_tail(TreeNode* ltree) {
+TNHdl Parser::expr_tail(TNHdl::pointer ltree) {
     TokenType tt = lexer.peek();
     switch (tt) {
     case TokenType::Add:
     case TokenType::Sub:
         lexer.consume();
-        return expr_tail(new_tree_node(tt, ltree, term()));
+        return expr_tail(new_tree_node(tt, ltree, term().release()).release());
     default:
-        return ltree;
+        return TNHdl(ltree);
     }
 }
 
-TreeNode* Parser::term() {
+TNHdl Parser::term() {
     auto ltree = power();
-    return term_tail(ltree);
+    return term_tail(ltree.release());
 }
 
-TreeNode* Parser::term_tail(TreeNode* ltree) {
+TNHdl Parser::term_tail(TNHdl::pointer ltree) {
     TokenType tt = lexer.peek();
     switch (tt) {
     case TokenType::Mul:
@@ -50,29 +51,29 @@ TreeNode* Parser::term_tail(TreeNode* ltree) {
     case TokenType::Mod:
     case TokenType::ExactDiv:
         lexer.consume();
-        return term_tail(new_tree_node(tt, ltree, power()));
+        return term_tail(new_tree_node(tt, ltree, power().release()).release());
     default:
-        return ltree;
+        return TNHdl(ltree);
     }
 }
 
-TreeNode* Parser::power() {
+TNHdl Parser::power() {
     auto ltree = factor();
-    return power_tail(ltree);
+    return power_tail(ltree.release());
 }
 
-TreeNode* Parser::power_tail(TreeNode* ltree) {
+TNHdl Parser::power_tail(TNHdl::pointer ltree) {
     TokenType tt = lexer.peek();
     switch (tt) {
     case TokenType::Pow:
         lexer.consume();
-        return new_tree_node(tt, ltree, power_tail(factor())); // 注意乘方运算是右结合的
+        return new_tree_node(tt, ltree, power_tail(factor().release()).release()); // 注意乘方运算是右结合的
     default:
-        return ltree;
+        return TNHdl(ltree);
     }
 }
 
-TreeNode* Parser::factor() {
+TNHdl Parser::factor() {
     auto tt = lexer.peek();
     switch (tt) {
     case TokenType::LPt: {
@@ -95,7 +96,7 @@ TreeNode* Parser::factor() {
 
 
 ExprTree Parser::build_tree() {
-    auto tree = ExprTree(expr());
+    auto tree = ExprTree(expr().release());
 
     // 解析完表达式而没有到达结尾，是输入字符串异常
     if (lexer.peek() != TokenType::None)

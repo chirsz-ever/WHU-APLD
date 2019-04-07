@@ -21,13 +21,13 @@ private:
     void match(TokenType);
 
     // 为每个非终结符编写一个函数
-    TreeNode* expr();
-    TreeNode* expr_tail(TreeNode* ltree);
-    TreeNode* term();
-    TreeNode* term_tail(TreeNode* ltree);
-    TreeNode* power();
-    TreeNode* power_tail(TreeNode* ltree);
-    TreeNode* factor();
+    TNHdl expr();
+    TNHdl expr_tail(TNHdl::pointer ltree);
+    TNHdl term();
+    TNHdl term_tail(TNHdl::pointer ltree);
+    TNHdl power();
+    TNHdl power_tail(TNHdl::pointer ltree);
+    TNHdl factor();
 };
 
 }

@@ -80,3 +80,6 @@ quit.
 
 本程序中词法解析器和语法解析器的构建主要参考了这一系列的博文：[手把手教你构建 C 语言编译器](https://lotabout.me/2015/write-a-C-interpreter-0/)，在此对文章作者[lotabout](https://lotabout.me/)表示感谢。
 
+## todo
+- [ ] 符合华为格式规范
+- [x] 解决`throw`时的内存泄漏

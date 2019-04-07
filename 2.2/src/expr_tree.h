@@ -4,6 +4,7 @@
 #include <token.h>
 #include <iosfwd>
 #include <string>
+#include <memory>
 
 namespace chirsz {
 
@@ -11,25 +12,26 @@ struct TreeNode
 {
     TokenType ttype;
     TokenValue tval;
-    TreeNode* left;
-    TreeNode* right;
+    std::unique_ptr<TreeNode> left;
+    std::unique_ptr<TreeNode> right;
 };
 
-TreeNode* new_tree_node(TokenType ttype, TreeNode* left, TreeNode* right);
-void delete_tree_node(TreeNode*);
+using TNHdl = std::unique_ptr<TreeNode>;
+
+TNHdl new_tree_node(TokenType ttype, TNHdl::pointer left, TNHdl::pointer right);
 
 class ExprTree
 {
 public:
     ExprTree();
     ExprTree(TreeNode*); // 获得所有权
-    ExprTree(ExprTree&&)=default;
-    ~ExprTree();
+    ExprTree(ExprTree&&) = default;
+    ~ExprTree() = default;
 
     const ExprTree& operator=(ExprTree&&);
 
 private:
-    TreeNode* head;
+    TNHdl head;
 // friend:
     // 以中缀形式输出表达式树
     friend std::ostream& print_as_infix(std::ostream&, const ExprTree&);
