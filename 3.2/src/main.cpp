@@ -190,7 +190,7 @@ int main(int argc, const char *argv[]) {
         r_flush();
     }
 
-    if (!search_path_down) 
+    if (gctx.status == SEARCHING_PATH) 
         searching_path.detach();
 
     while (ege::is_run()) ege::delay_fps(24);
