@@ -1,5 +1,6 @@
 #include "GameContex.h"
 #include <algorithm>
+#include <cmath>
 
 int GameContex::chess_radius() const
 {
