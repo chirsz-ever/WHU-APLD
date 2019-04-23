@@ -8,12 +8,11 @@
 
 const char* labeltexts[] = { u8"请选择一个开始点",
                              u8"请选择零个或几个障碍点",
-                             u8"点击\"下一步\"按钮以开始\n寻找可行路径",
                              u8"找到一条可行路径",
                              u8"未找到可行路径"
                            };
 
-static void full_window(mu_Context *ctx, GameStatus status, bool* btn_pressed) {
+static void game_window(mu_Context *ctx, const char* prompt_text, bool disp_button, const char* button_label, bool* btn_pressed) {
     static mu_Container window;
 
     /* init window manually so we can set its position and size */
@@ -23,10 +22,11 @@ static void full_window(mu_Context *ctx, GameStatus status, bool* btn_pressed) {
     }
     if (mu_begin_window_ex(ctx, &window, "", MU_OPT_NOTITLE | MU_OPT_NOINTERACT | MU_OPT_NORESIZE)) {
         mu_layout_set_next(ctx, mu_rect(600, 150, 100, 100), 0);
-        mu_text(ctx, labeltexts[status]);
-        mu_layout_set_next(ctx, mu_rect(650, 280, 100, 40), 0);
-        if (status != DISPLAY_PATH&&status != UNFIND_PATH) {
-            if (mu_button(ctx, u8"下一步")) *btn_pressed = true;
+        mu_text(ctx, prompt_text);
+        if (disp_button)
+        {
+            mu_layout_set_next(ctx, mu_rect(650, 280, 100, 40), 0);
+            if (mu_button(ctx, button_label)) *btn_pressed = true;
         }
         mu_end_window(ctx);
     }
@@ -97,8 +97,23 @@ int main(int argc, const char *argv[]) {
         }
 
         /* process frame */
+        const char* prompt_text = labeltexts[gctx.status];
+        const char* next_step = u8"下一步";
         mu_begin(ctx);
-        full_window(ctx, gctx.status, &btn_pressed);
+        switch (gctx.status) {
+        case CHOOSE_START_POINT:
+            game_window(ctx, prompt_text, true, next_step, &btn_pressed);
+            break;
+        case CHOOSE_OBSTRUCTIONS:
+            game_window(ctx, prompt_text, true, u8"开始寻找路径", &btn_pressed);
+            break;
+        case DISPLAY_PATH:
+            game_window(ctx, prompt_text, false, nullptr, &btn_pressed);
+            break;
+        case UNFIND_PATH:
+            game_window(ctx, prompt_text, false, nullptr, &btn_pressed);
+            break;
+        }
         mu_end(ctx);
 
         /* process Game */
@@ -109,11 +124,6 @@ int main(int argc, const char *argv[]) {
             }
             break;
         case CHOOSE_OBSTRUCTIONS:
-            if (btn_pressed) {
-                next_status = BEFORE_DISPLAY_PATH;
-            }
-            break;
-        case BEFORE_DISPLAY_PATH:
             if (btn_pressed) {
                 path = gctx.search_path();
                 next_status = path.size() ? DISPLAY_PATH : UNFIND_PATH;
