@@ -5,12 +5,10 @@
 #include "GameContex.h"
 #include <cstdio>
 #include <ctime>
+#include <thread>
+#include <atomic>
 
-const char* labeltexts[] = { u8"请选择一个开始点",
-                             u8"请选择零个或几个障碍点",
-                             u8"找到一条可行路径",
-                             u8"未找到可行路径"
-                           };
+using std::chrono::milliseconds;
 
 static void game_window(mu_Context *ctx, const char* prompt_text, bool disp_button, const char* button_label, bool* btn_pressed) {
     static mu_Container window;
@@ -50,14 +48,22 @@ static void getargs(int argc, const char *argv[], int& rows, int& cols) {
     }
 }
 
+const char* labeltexts[] = { u8"请选择一个开始点",
+                             u8"请选择零个或几个障碍点",
+                             u8"正在搜索路径……",
+                             u8"找到了一条可行路径",
+                             u8"未找到可行路径"
+                           };
 
 int main(int argc, const char *argv[]) {
     int rows, cols;
     getargs(argc, argv, rows, cols);
     GameContex gctx(rows, cols, 600, 600, 50);
     std::vector<ChessPosition> path;
+    std::thread searching_path;
+    std::atomic_bool search_path_down(false);
 
-    r_init(800, 600, ege::INIT_ANIMATION&~ege::INIT_WITHLOGO);
+    r_init(800, 600, ege::INIT_ANIMATION & ~ege::INIT_WITHLOGO);
     ::SetWindowText(ege::getHWnd(), "Horse");
 
     /* init microui */
@@ -89,7 +95,8 @@ int main(int argc, const char *argv[]) {
                 ege2mu_input_mouse(ctx, mmsg);
             } while (mmsg.is_move() && (clock() - tic) < CLOCKS_PER_SEC / 60);
 
-            if (mmsg.is_down())
+            if (mmsg.is_down() &&
+                    (gctx.status == CHOOSE_START_POINT || gctx.status == CHOOSE_OBSTRUCTIONS))
                 gctx.input_mouse_down(mmsg.x, mmsg.y);
         }
         else {
@@ -107,11 +114,14 @@ int main(int argc, const char *argv[]) {
         case CHOOSE_OBSTRUCTIONS:
             game_window(ctx, prompt_text, true, u8"开始寻找路径", &btn_pressed);
             break;
+        case SEARCHING_PATH:
+            game_window(ctx, prompt_text, false, nullptr, nullptr);
+            break;
         case DISPLAY_PATH:
-            game_window(ctx, prompt_text, false, nullptr, &btn_pressed);
+            game_window(ctx, prompt_text, false, nullptr, nullptr);
             break;
         case UNFIND_PATH:
-            game_window(ctx, prompt_text, false, nullptr, &btn_pressed);
+            game_window(ctx, prompt_text, false, nullptr, nullptr);
             break;
         }
         mu_end(ctx);
@@ -125,15 +135,28 @@ int main(int argc, const char *argv[]) {
             break;
         case CHOOSE_OBSTRUCTIONS:
             if (btn_pressed) {
-                path = gctx.search_path();
-                next_status = path.size() ? DISPLAY_PATH : UNFIND_PATH;
+                next_status = SEARCHING_PATH;
+                searching_path = std::thread([&]()mutable{
+                    path = gctx.search_path();
+                    search_path_down = true;
+                });
+            }
+            break;
+        case SEARCHING_PATH:
+            if (search_path_down)
+            {
+                searching_path.join();
+                if (path.size())
+                    next_status = DISPLAY_PATH;
+                else
+                    next_status = UNFIND_PATH;
             }
             break;
         default: // DISPLAY_PATH, UNFIND_PATH
             break;
         }
 
-        /* render */
+        /* render GUI*/
         mu_Command *cmd = NULL;
         while (mu_next_command(ctx, &cmd)) {
             switch (cmd->type) {
@@ -152,6 +175,7 @@ int main(int argc, const char *argv[]) {
             }
         }
 
+        /* render chessboard */
         gctx.drawChessBoard(EGERGB(140, 140, 255));
         if (gctx.status == DISPLAY_PATH) {
             gctx.drawChessPath(path, ege::RED, true);
@@ -165,6 +189,9 @@ int main(int argc, const char *argv[]) {
         gctx.status = next_status;
         r_flush();
     }
+
+    if (!search_path_down) 
+        searching_path.detach();
 
     while (ege::is_run()) ege::delay_fps(24);
 
