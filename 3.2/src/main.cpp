@@ -73,7 +73,7 @@ int main(int argc, const char *argv[]) {
     ctx->text_width = r_get_text_width;
     ctx->text_height = r_get_text_height;
     ctx->style->colors[MU_COLOR_WINDOWBG] = mu_color(255, 255, 255, 255);
-    ctx->style->colors[MU_COLOR_BUTTON] = mu_color(128, 128, 128, 255);
+    ctx->style->colors[MU_COLOR_BUTTON] = mu_color(180, 180, 180, 255);
     ctx->style->colors[MU_COLOR_BUTTONHOVER] = mu_color(230, 230, 230, 255);
     ctx->style->colors[MU_COLOR_BUTTONFOCUS] = mu_color(200, 200, 200, 255);
     ctx->style->colors[MU_COLOR_TEXT] = mu_color(0, 0, 0, 255);
