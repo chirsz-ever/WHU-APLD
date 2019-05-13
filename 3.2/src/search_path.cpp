@@ -13,7 +13,7 @@ enum GridStatus
 class PathSearcher
 {
 public:
-    PathSearcher(const GameContex& _gctx);
+    explicit PathSearcher(const GameContex& _gctx);
     ~PathSearcher() = default;
 
     const GameContex& gctx;
