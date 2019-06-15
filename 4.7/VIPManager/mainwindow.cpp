@@ -24,6 +24,8 @@ MainWindow::MainWindow(QWidget *parent, int _salesman_id) :
     setTableView();
 
     ui->menuBar->hide();
+
+    setWindowTitle(u8"会员管理系统");
 }
 
 MainWindow::~MainWindow()
